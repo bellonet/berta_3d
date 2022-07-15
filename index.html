@@ -1,0 +1,95 @@
+<html>
+
+	<head>
+		<title>berta 3D</title>
+
+		<style>
+			body{margin: 0}
+			canvas {width: 50%; height: 50%;}
+		</style>
+	</head>
+
+	<body>
+
+		<script src="js/three.js"></script>
+
+        <script type="module" src="js/FirstPersonControls.js"></script>
+
+		<script type="module" src="js/GLTFLoader.js"></script>
+
+        <script type="module">
+
+            import {GLTFLoader} from "./js/GLTFLoader.js";
+            import {FirstPersonControls} from "./js/FirstPersonControls.js";
+
+            var scene = new THREE.Scene();
+            var camera = new THREE.PerspectiveCamera( //fov, aspect, near, far
+                85, 
+                window.innerWidth/window.innerHeight, 
+                .01, 
+                25);
+
+            // Setting up first person control of camera
+            var controls = new FirstPersonControls(camera);
+            controls.lookSpeed = 0.01;
+            controls.movementSpeed = 5;
+
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            document.body.appendChild(renderer.domElement);
+
+            // Loading up the 3D model (AKA Berta)
+			var loader = new GLTFLoader();
+
+            var obj;
+			loader.load('assets/first_hall_dummy1.glb', function (gltf) {
+                obj = gltf.scene;
+                //obj.rotation.x = Math.PI / 7; // for nicer initial static viewing
+                scene.add(gltf.scene);
+			}, undefined, function ( error ) {
+			console.error( error );
+			} );
+
+            scene.background = new THREE.Color(0x696969); // Helps for initial testing
+
+            var light = new THREE.HemisphereLight(0xffffff, 0x000000, 2); // 1st color, 2nd color, intensity
+            light.position.set(5,7,7)
+            scene.add(light);
+
+            camera.position.set(10,2,0);
+
+            var step = 0;
+            var stepy = 0;
+
+            var clock = new THREE.Clock();
+
+            function renderScene() {
+                step += 0.005;
+                stepy += 0.00005;
+                var delta = clock.getDelta();
+
+                controls.update(delta);
+                renderer.clear();
+
+                requestAnimationFrame(renderScene);
+                renderer.render(scene, camera);
+            }
+
+            renderScene();
+
+            ////// First try (success) - render scene
+            // camera.position.set(0,0,18);
+
+            // function animate() {
+            //     requestAnimationFrame(animate);
+            //     renderer.render(scene, camera);
+            // }
+
+            // animate();
+
+		</script>
+
+	</body>
+
+</html>
