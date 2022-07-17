@@ -1,3 +1,6 @@
+<!-- First Person Camera based on: -->
+<!-- https://github.com/simondevyoutube/ThreeJS_Tutorial_FirstPersonCamera/blob/main/main.js -->
+
 <html>
 
 	<head>
@@ -276,6 +279,7 @@
 				initializeScene_() {
 
 					let that = this;
+					this.objects_ = [];
 
 					var loader = new GLTFLoader();
 					var obj;
@@ -283,10 +287,10 @@
 						obj = gltf.scene;
 						that.scene_.add(obj);
 						//obj.rotation.x = Math.PI / 7; // for nicer initial static viewing
+						// unfortunately its overwritten - need to solve this
 					}, undefined, function ( error ) {
 					console.error( error );
 					} );
-					this.objects_ = [];
 
 					var txtLoader = new FontLoader();
 					txtLoader.load('./fonts/RepublicaMinor2.0_Regular.json', function(font) {
@@ -306,6 +310,23 @@
 						txtMesh.rotation.y = Math.PI * 1.7;
 						that.scene_.add(txtMesh);
 					});
+
+					// invisible objects for ray intersaction - so the user would bump into them.
+
+				    const box = new THREE.Mesh(
+				      new THREE.BoxGeometry(4, 4, 4),
+				      new THREE.MeshStandardMaterial());
+				    box.position.set(10, 2, 0);
+				    box.castShadow = true;
+				    box.receiveShadow = true;
+				    this.scene_.add(box);
+
+
+				      const b = new THREE.Box3();
+				      b.setFromObject(box);
+				      this.objects_.push(b);
+				    
+
 				}
 
 				initializeLights_() {
@@ -366,7 +387,6 @@
 				step_(timeElapsed) {
 					const timeElapsedS = timeElapsed * 0.001;
 
-					// this.controls_.update(timeElapsedS);
 					this.fpsCamera_.update(timeElapsedS);
 				}
 			}
